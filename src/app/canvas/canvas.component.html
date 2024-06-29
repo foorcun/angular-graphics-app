@@ -1,6 +1,6 @@
 <!-- calisma alani -->
- <div style="border: 2px solid black; display: inline-block;">
-<canvas #canvas width="800" height="600" ></canvas> 
+<div style="border: 2px solid black; display: inline-block">
+  <canvas #canvas width="800" height="600"></canvas>
 </div>
 <button (click)="clear()">clear</button>
 <button (click)="putRectangle()">put red rectangle</button>
@@ -9,3 +9,29 @@
 <button (click)="rotateLine()">rotate Line</button>
 <button (click)="frameTransformation()">frame tranformation</button>
 <button (click)="rotateLineGlobal()">rotateLineGlobal</button>
+<button (click)="rectangleWith4Parameter()">rectangleWith4Parameter</button>
+<button
+  (click)="
+    rectangleWith4Coordinates([
+      { x: 50, y: 70 },
+      { x: 350, y: 50 },
+      { x: 150, y: 150 },
+      { x: 50, y: 150 }
+    ])
+  "
+>
+  rectangleWith4Coordinates
+</button>
+
+<button
+  (click)="
+  rectangleRotate([
+      { x: -50, y: 40 },
+      { x: 250, y: 60 },
+      { x: 50, y: -40 },
+      { x: -50, y: -40 }
+    ])
+  "
+>
+rectangleRotate
+</button>
