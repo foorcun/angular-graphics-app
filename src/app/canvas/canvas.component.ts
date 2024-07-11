@@ -1,5 +1,7 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { VectorObject2D } from './canvas.model';
+import { Point3D, VectorObject2D } from './canvas.model';
+import { MatrixUtil } from '../utils/matrix.util';
+import { DrawingUtil } from '../utils/drawing.util';
 
 
 @Component({
@@ -13,6 +15,8 @@ export class CanvasComponent implements AfterViewInit {
 
   width = 800; // x axis
   height = 600; // y axis
+
+  centerOfTheScreen = new VectorObject2D(this.width / 2, this.height / 2)
 
   rotateCounter = 0;
 
@@ -63,6 +67,15 @@ export class CanvasComponent implements AfterViewInit {
 
   }
 
+  drawLineParametric(baslangic: VectorObject2D, bitis: VectorObject2D) {
+    if (this.ctx) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(baslangic.i, baslangic.j);
+      this.ctx.lineTo(bitis.i, bitis.j);
+      this.ctx.stroke();
+    }
+  }
+
   rotateLine() {
     // console.log(Math.cos(this.angleToRadianConverter(60))); // 0.5
     var vector = [100, 100];
@@ -111,37 +124,37 @@ export class CanvasComponent implements AfterViewInit {
   }
 
   changeFrame(newBasisMatrix: number[], coordinate: VectorObject2D) {
-    var inverseBasisMatrix = [[1, 0], [0, -1]];
+    var inverseBasisMatrix = [[1, 0], [0, -1]]; // inverse hesabi, screen icin ni elle girdim. hesap yapilmali aslinda.le
 
     // for (let i = 0; i < coordinates.length; i++) {
     var coordinateNew = this.multiplyMatrixVectorObject(inverseBasisMatrix, coordinate);
     // console.log(coordinateNew)
     // console.log(coordinates[i].x)
-    coordinate.x = coordinateNew[0] + 400; // +400 oteleme icin.
+    coordinate.i = coordinateNew[0] + 400; // +400 oteleme icin.
 
     // console.log(coordinates[i].x)
-    coordinate.y = coordinateNew[1] + 300;
+    coordinate.j = coordinateNew[1] + 300;
     // 
     // console.log(coordinates)
     return coordinate;
   }
-  rotatePoint(coordinate: VectorObject2D, angle: number){
+  rotatePoint(coordinate: VectorObject2D, angle: number) {
     var rotationMatrix = this.rotationMatrix(angle);
     var coordinateNew = this.multiplyMatrixVectorObject(rotationMatrix, coordinate);
-    return new VectorObject2D(coordinateNew[0],coordinateNew[1])
+    return new VectorObject2D(coordinateNew[0], coordinateNew[1])
   }
 
   rectangleRotate(coordinates: VectorObject2D[]) {
-    
+
     this.clear();
-    
+
     for (let i = 0; i < coordinates.length; i++) {
 
-      coordinates[i] = this.rotatePoint(coordinates[i],15 * this.rotateCounter)
+      coordinates[i] = this.rotatePoint(coordinates[i], 15 * this.rotateCounter)
 
       coordinates[i] = this.changeFrame([], coordinates[i])
     }
-    
+
     this.rectangleWith4Coordinates(coordinates);
 
     this.rotateCounter++;
@@ -239,8 +252,8 @@ export class CanvasComponent implements AfterViewInit {
 
   // Function to multiply a 2D rotation matrix by a column vector
   multiplyMatrixVectorObject(matrix: number[][], vector: VectorObject2D) {
-    const x = vector.x;
-    const y = vector.y;
+    const x = vector.i;
+    const y = vector.j;
 
     console.log(x);
     console.log(y);
@@ -259,4 +272,35 @@ export class CanvasComponent implements AfterViewInit {
     return Math.PI * (angle / 180);
   }
 
+  drawCoordinateSystem() {
+
+    var arrayPoints = [
+      new Point3D(50, 0, 0),
+      new Point3D(0, 50, 0),
+      new Point3D(0, 0, 50),
+      // new Point3D(10, 0, 10),
+    ]
+
+    for (var p of arrayPoints) {
+      var pointFrameCoordinate = MatrixUtil.getPointInFrameCoordinate(p)
+      // this.drawLineParametric(new VectorObject2D(this.width / 2, this.height / 2), pointFrameCoordinate)
+      DrawingUtil.drawLine(this.ctx, this.centerOfTheScreen, pointFrameCoordinate)
+    }
+
+
+    DrawingUtil.drawLine(this.ctx, MatrixUtil.getPointInFrameCoordinate(new Point3D(30, 10, 0)),
+      MatrixUtil.getPointInFrameCoordinate(new Point3D(30, 30, 0)))
+
+    DrawingUtil.drawLine(this.ctx, MatrixUtil.getPointInFrameCoordinate(new Point3D(30, 30, 0)),
+      MatrixUtil.getPointInFrameCoordinate(new Point3D(10, 30, 0)))
+
+    DrawingUtil.drawLine(this.ctx, MatrixUtil.getPointInFrameCoordinate(new Point3D(10, 30, 0)),
+      MatrixUtil.getPointInFrameCoordinate(new Point3D(10, 10, 0)))
+
+    DrawingUtil.drawLine(this.ctx, MatrixUtil.getPointInFrameCoordinate(new Point3D(10, 10, 0)),
+      MatrixUtil.getPointInFrameCoordinate(new Point3D(30, 10, 0)))
+
+
+
+  }
 }
